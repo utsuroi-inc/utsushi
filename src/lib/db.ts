@@ -19,6 +19,11 @@ export interface SessionMeta {
   totalHeightCss: number;
   dpr: number;
   actualStepsCss: number[];
+  // ファイル名テンプレート用。URL全体ではなくホスト名だけを持つ（テンプレートが使うのは{url_host}のみ）。
+  // レコードごとのフィールド追加でインデックスは変わらないため、DB_VERSIONの更新は不要。
+  pageTitle?: string;
+  pageHost?: string;
+  capturedAt?: number;
 }
 
 interface SessionRecord {

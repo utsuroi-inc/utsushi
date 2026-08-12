@@ -28,6 +28,12 @@ export interface CompositePlan {
   canvasWidth: number;
   canvasHeight: number;
   placements: SegmentPlacement[];
+  /**
+   * 実測から逆算したCSSピクセル→実ピクセルの倍率。
+   * devicePixelRatioの理論値ではなく実測値なので、PDFの用紙寸法など
+   * 「実ピクセルをCSSピクセルに戻す」計算では常にこちらを使う。
+   */
+  scale: number;
 }
 
 /**
@@ -74,5 +80,5 @@ export function computeCompositePlan(
     destY += sourceHeight;
   }
 
-  return { canvasWidth: segWidth, canvasHeight: destY, placements };
+  return { canvasWidth: segWidth, canvasHeight: destY, placements, scale: scaleY };
 }

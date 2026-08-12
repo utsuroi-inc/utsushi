@@ -18,6 +18,23 @@ interface CaptureState {
   cancelled: boolean;
 }
 
+// ファイル名テンプレート用のページ情報。activeTab権限でtab.title/tab.urlが読めるため
+// 追加権限は不要。URL全体は保持せずホスト名だけを取り出す。
+interface PageInfo {
+  title: string;
+  host: string;
+}
+
+function toPageInfo(tab: chrome.tabs.Tab): PageInfo {
+  let host = '';
+  try {
+    if (tab.url) host = new URL(tab.url).hostname;
+  } catch {
+    host = '';
+  }
+  return { title: tab.title ?? '', host };
+}
+
 const runningCaptures = new Map<number, CaptureState>();
 
 // クォータはブラウザ全体で共有のため、レート制限の計測もキャプチャ実行をまたいで共有する
@@ -55,7 +72,7 @@ async function handleClick(tab: chrome.tabs.Tab): Promise<void> {
   const state: CaptureState = { cancelled: false };
   runningCaptures.set(tab.id, state);
   try {
-    await runCapture(tab.id, tab.windowId, state);
+    await runCapture(tab.id, tab.windowId, state, toPageInfo(tab));
   } finally {
     // 成功・失敗・キャンセルのいずれでも必ず解放する。
     // 残すと次のクリックが「新規撮影」でなく「キャンセル」と誤認され、再撮影できなくなる。
@@ -63,8 +80,14 @@ async function handleClick(tab: chrome.tabs.Tab): Promise<void> {
   }
 }
 
-async function runCapture(tabId: number, windowId: number, state: CaptureState): Promise<void> {
+async function runCapture(
+  tabId: number,
+  windowId: number,
+  state: CaptureState,
+  pageInfo: PageInfo,
+): Promise<void> {
   const captureId = crypto.randomUUID();
+  const capturedAt = Date.now();
   let original: { scrollX: number; scrollY: number } | null = null;
   let injected = false;
   let succeeded = false;
@@ -154,6 +177,9 @@ async function runCapture(tabId: number, windowId: number, state: CaptureState):
       totalHeightCss: measurement.totalHeightCss,
       dpr: measurement.dpr,
       actualStepsCss,
+      pageTitle: pageInfo.title,
+      pageHost: pageInfo.host,
+      capturedAt,
     });
 
     await chrome.tabs.create({
