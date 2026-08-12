@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "巻物",
+  "version": "0.0.1",
+  "description": "Webページ全体を1枚の画像として保存します（開発中）",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwE+I04Repv3EbC8mkMyRSkGGZFBEdU4hYZo4y/R8JpdRqYmpS5DS3ooFZG3IZMxYiEbOIUk+fH2ljPh8KusJne93p9gNCg5HTDC25yK7oEaPNrJdBGB4diFveyy1jCIDRWXF+9ZxtM8V8gu5UU2b+KMCUt9hgCklJqUH7wSUX3A6djPTl+0IMvBK4OUFo53EwA9V9YB8wUxie/gH3TdBhGCIgJcWcMlTyiaUOdAiUjmiQA4RyrgDrcJKCRcJ5p0mshL0qIIIojMCsmubG+pRdphPhvJD3fMIu7PyJaqLQGPQEL2kjwiput5tLgin2eg/qokIFV6dHcit/BHkexTuIQIDAQAB",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["activeTab", "scripting", "storage"]
+}

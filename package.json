@@ -1,0 +1,17 @@
+{
+  "name": "makimono",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Webページ全体を1枚の画像またはPDFとして保存するChrome拡張（Manifest V3）",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.2.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>巻物 - キャプチャ結果</title>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  body {
+    margin: 0;
+    padding: 24px;
+    font-family: system-ui, -apple-system, "Hiragino Sans", sans-serif;
+    background: #fafaf7;
+    color: #222;
+  }
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: #1c1a17;
+      color: #eee;
+    }
+  }
+  #message {
+    font-size: 16px;
+  }
+  #result-image {
+    max-width: 100%;
+    display: block;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+</style>
+</head>
+<body>
+  <p id="message" hidden></p>
+  <img id="result-image" alt="キャプチャ結果" />
+  <script src="result.js"></script>
+</body>
+</html>
