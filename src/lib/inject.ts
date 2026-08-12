@@ -11,6 +11,7 @@
 //   スタイル要素ID:        'makimono-scroll-reset'
 //   オーバーレイ要素ID:    'makimono-progress-overlay'
 //   visibility退避属性:    'data-makimono-hidden'
+//   loading退避属性:       'data-makimono-loading'
 
 export interface Measurement {
   original: { scrollX: number; scrollY: number };
@@ -22,24 +23,30 @@ export interface Measurement {
 
 export async function prepareAndMeasure(): Promise<Measurement> {
   const STYLE_ID = 'makimono-scroll-reset';
+  const LOADING_ATTR = 'data-makimono-loading';
   const DECODE_TIMEOUT_MS = 3000;
   const original = { scrollX: window.scrollX, scrollY: window.scrollY };
 
   if (!document.getElementById(STYLE_ID)) {
     const style = document.createElement('style');
     style.id = STYLE_ID;
-    style.textContent = '* { scroll-behavior: auto !important; }';
+    // smoothスクロールとscroll-snapはどちらも「指定位置に着地しない」原因になるため撮影中は無効化する
+    style.textContent = '* { scroll-behavior: auto !important; scroll-snap-type: none !important; }';
     document.documentElement.appendChild(style);
   }
 
   // FR-04: lazy画像をeagerに切り替えてデコードを待つ。高さ計測より先に行うことで、
   // デコードによるレイアウトシフトを計測に反映させる。
   // 取得が終わらない画像が1枚でもあると全体が固まるため、1枚ごとにタイムアウトと競わせる。
+  // 元のloading値は属性に退避し、restorePageで戻す。
   const lazyImages = Array.from(
     document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]'),
   );
   await Promise.all(
     lazyImages.map((img) => {
+      if (!img.hasAttribute(LOADING_ATTR)) {
+        img.setAttribute(LOADING_ATTR, img.getAttribute('loading') ?? '');
+      }
       img.loading = 'eager';
       return Promise.race([
         img.decode().catch(() => {}),
@@ -65,14 +72,22 @@ export async function prepareAndMeasure(): Promise<Measurement> {
   };
 }
 
-export function scrollAndSettle(y: number): Promise<{ scrollY: number }> {
+// 描画反映は二重rAFで待つが、バックグラウンドタブではrAFが停止して永久に解決しなくなるため、
+// タイムアウトで必ず戻す。呼び出し側は戻り値のvisibleを見て中断を判定する。
+export function scrollAndSettle(y: number): Promise<{ scrollY: number; visible: boolean }> {
   return new Promise((resolve) => {
     window.scrollTo({ top: y, left: 0, behavior: 'instant' });
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve({ scrollY: window.scrollY, visible: document.visibilityState === 'visible' });
+    };
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        resolve({ scrollY: window.scrollY });
-      });
+      requestAnimationFrame(finish);
     });
+    // バックグラウンドタブではタイマーも1秒粒度に間引かれるため余裕を持たせる
+    setTimeout(finish, 1500);
   });
 }
 
@@ -99,16 +114,24 @@ export function prepareOverlay(): void {
 }
 
 // FR-05: キャプチャの瞬間はオーバーレイを必ず非表示にする。
-// visibilityの変更が実際に描画へ反映されるまで待ってから戻る（scrollAndSettleと同じ二重rAF）。
+// visibilityの変更が実際に描画へ反映されるまで待ってから戻る（scrollAndSettleと同じ二重rAF＋
+// バックグラウンド時のタイムアウトフォールバック）。
 // これを省くと、特にレート制限待ちが発生しない1枚目でオーバーレイが写り込む。
 export function hideOverlay(): Promise<void> {
   const OVERLAY_ID = 'makimono-progress-overlay';
   return new Promise((resolve) => {
     const overlay = document.getElementById(OVERLAY_ID);
     if (overlay) overlay.style.visibility = 'hidden';
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => resolve());
+      requestAnimationFrame(finish);
     });
+    setTimeout(finish, 1500);
   });
 }
 
@@ -121,6 +144,7 @@ export function showOverlayProgress(percent: number): void {
 }
 
 // FR-03: 2枚目以降のセグメントに固定要素が重複して写らないよう隠す（1枚目には写す）。
+// 冪等（退避済み要素はスキップ）なので、撮影中に出現した固定要素を拾うため毎ステップ呼んでよい。
 export function hideFixedElements(): void {
   const OVERLAY_ID = 'makimono-progress-overlay';
   const HIDDEN_ATTR = 'data-makimono-hidden';
@@ -146,10 +170,12 @@ export function hideFixedElements(): void {
 }
 
 // NFR-05: どこか1箇所の復元が失敗しても他の復元を道連れにしないよう、各処理を独立させる。
-export function restorePage(original: { scrollX: number; scrollY: number }): void {
+// originalがnull（測定に失敗した等）でも、注入済みのスタイル・属性の復元は常に行う。
+export function restorePage(original: { scrollX: number; scrollY: number } | null): void {
   const STYLE_ID = 'makimono-scroll-reset';
   const OVERLAY_ID = 'makimono-progress-overlay';
   const HIDDEN_ATTR = 'data-makimono-hidden';
+  const LOADING_ATTR = 'data-makimono-loading';
 
   try {
     document.getElementById(STYLE_ID)?.remove();
@@ -173,7 +199,23 @@ export function restorePage(original: { scrollX: number; scrollY: number }): voi
   }
 
   try {
-    window.scrollTo({ top: original.scrollY, left: original.scrollX, behavior: 'instant' });
+    document.querySelectorAll<HTMLImageElement>(`img[${LOADING_ATTR}]`).forEach((img) => {
+      const saved = img.getAttribute(LOADING_ATTR);
+      if (saved) {
+        img.setAttribute('loading', saved);
+      } else {
+        img.removeAttribute('loading');
+      }
+      img.removeAttribute(LOADING_ATTR);
+    });
+  } catch (e) {
+    console.error('[makimono] 画像loading属性の復元に失敗しました', e);
+  }
+
+  try {
+    if (original) {
+      window.scrollTo({ top: original.scrollY, left: original.scrollX, behavior: 'instant' });
+    }
   } catch (e) {
     console.error('[makimono] スクロール位置の復元に失敗しました', e);
   }
