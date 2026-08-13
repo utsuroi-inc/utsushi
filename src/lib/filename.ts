@@ -78,8 +78,14 @@ export function sanitizeFilename(raw: string): string {
  *
  * @param template 例: '{title}_{yyyyMMdd-HHmmss}'
  * @param extension 先頭のドットを含まない拡張子（'png' 等）
+ * @param suffix 分割時の連番など、拡張子の直前に付ける文字列（例: '_1of3'）
  */
-export function buildFilename(template: string, tokens: FilenameTokens, extension: string): string {
+export function buildFilename(
+  template: string,
+  tokens: FilenameTokens,
+  extension: string,
+  suffix = '',
+): string {
   // タイトルは先に単体で切り詰める（長いタイトルが時刻を押し出さないように）
   const title = truncateByCodePoints(
     sanitizeFilename(tokens.title),
@@ -97,17 +103,14 @@ export function buildFilename(template: string, tokens: FilenameTokens, extensio
     name = FALLBACK_NAME;
   }
 
-  const suffix = `.${extension}`;
-  name = truncateByCodePoints(
-    name,
-    Number.MAX_SAFE_INTEGER,
-    FILENAME_MAX_BYTES - utf8Length(suffix),
-  );
+  // 連番と拡張子は必ず残したいので、切り詰めの対象から外して先に長さを確保する
+  const tail = `${sanitizeFilename(suffix)}.${extension}`;
+  name = truncateByCodePoints(name, Number.MAX_SAFE_INTEGER, FILENAME_MAX_BYTES - utf8Length(tail));
   // 切り詰めで末尾がドット・空白になった場合の再掃除
   name = name.replace(TRAILING_DOTS_SPACES, '');
   if (name.length === 0) {
     name = FALLBACK_NAME;
   }
 
-  return `${name}${suffix}`;
+  return `${name}${tail}`;
 }

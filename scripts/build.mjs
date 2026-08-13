@@ -27,8 +27,11 @@ async function copyDir(from, to) {
 async function copyStaticAssets() {
   await fs.mkdir(distDir, { recursive: true });
   await fs.copyFile(path.join(srcDir, 'manifest.json'), path.join(distDir, 'manifest.json'));
-  await fs.copyFile(path.join(srcDir, 'result.html'), path.join(distDir, 'result.html'));
+  for (const page of ['result.html', 'options.html']) {
+    await fs.copyFile(path.join(srcDir, page), path.join(distDir, page));
+  }
   await copyDir(path.join(srcDir, 'icons'), path.join(distDir, 'icons'));
+  await copyDir(path.join(srcDir, '_locales'), path.join(distDir, '_locales'));
   await copyDir(path.join(root, 'licenses'), path.join(distDir, 'licenses'));
 }
 
@@ -90,14 +93,14 @@ const backgroundOptions = {
 
 // 結果ページは同梱ライブラリ（jsPDF）が大きいため配布ビルドでは圧縮する。
 // watch中は読めるままにしておく（デバッグのため）。
-const resultOptions = {
+const pageOptions = {
   ...common,
-  entryPoints: [path.join(srcDir, 'result.ts')],
+  entryPoints: [path.join(srcDir, 'result.ts'), path.join(srcDir, 'options.ts')],
   minify: !isWatch,
 };
 
 if (isWatch) {
-  for (const options of [backgroundOptions, resultOptions]) {
+  for (const options of [backgroundOptions, pageOptions]) {
     const ctx = await esbuild.context(options);
     await ctx.watch();
   }
@@ -114,7 +117,7 @@ if (isWatch) {
   console.log('[build] watching for changes (Ctrl+C で終了)');
 } else {
   await esbuild.build(backgroundOptions);
-  await esbuild.build(resultOptions);
+  await esbuild.build(pageOptions);
   await copyStaticAssets();
   console.log('[build] done ->', path.relative(root, distDir));
 }

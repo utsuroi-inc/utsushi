@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-i18n-document-title="resultTitle">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>巻物 - キャプチャ結果</title>
+<title>makimono</title>
 <style>
   :root {
     color-scheme: light dark;
@@ -85,23 +85,42 @@
   }
 
   #status,
-  #message {
+  #message,
+  #split-notice {
     margin: 0;
     padding: 12px 24px;
     font-size: 14px;
     color: var(--muted);
   }
 
-  #canvas-wrap {
+  #parts {
     padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .part {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .part-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .part-canvas-wrap {
     overflow-x: auto;
   }
-  #result-canvas {
+  .part canvas {
     display: block;
     max-width: 100%;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   }
-  #result-canvas.actual-size {
+  .part canvas.actual-size {
     max-width: none;
   }
 </style>
@@ -109,23 +128,22 @@
 <body>
   <header id="bar">
     <div id="bar-left">
-      <span>巻物</span>
+      <span data-i18n="brand"></span>
       <span id="dimensions"></span>
     </div>
     <div id="bar-right">
-      <button id="btn-zoom" disabled>等倍で表示</button>
+      <button id="btn-zoom" data-i18n="zoomActual" disabled></button>
       <span class="sep"></span>
-      <button id="btn-png" disabled>PNG</button>
-      <button id="btn-jpeg" disabled>JPEG</button>
-      <button id="btn-pdf" disabled>PDF</button>
-      <button id="btn-copy" disabled>コピー</button>
+      <button id="btn-png" data-i18n="btnPng" disabled></button>
+      <button id="btn-jpeg" data-i18n="btnJpeg" disabled></button>
+      <button id="btn-pdf" data-i18n="btnPdf" disabled></button>
+      <button id="btn-copy" data-i18n="btnCopy" disabled></button>
     </div>
   </header>
+  <p id="split-notice" hidden></p>
   <p id="status" aria-live="polite" hidden></p>
   <p id="message" hidden></p>
-  <div id="canvas-wrap">
-    <canvas id="result-canvas"></canvas>
-  </div>
+  <div id="parts"></div>
   <script src="result.js"></script>
 </body>
 </html>

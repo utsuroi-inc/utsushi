@@ -82,3 +82,39 @@ export function computeCompositePlan(
 
   return { canvasWidth: segWidth, canvasHeight: destY, placements, scale: scaleY };
 }
+
+// FR-07: 合成キャンバスの安全上限。高さだけでなく総面積にも上限があるため両方で判定する。
+// Chromeのcanvas上限より十分小さい値を既定にしている（超えると生成に失敗して白紙になる）。
+export const MAX_IMAGE_HEIGHT_PX = 16000;
+export const MAX_IMAGE_AREA_PX = 64_000_000;
+
+export interface ImageSplit {
+  /** 全体画像における開始Y（実ピクセル） */
+  sourceY: number;
+  height: number;
+}
+
+/**
+ * 全体の高さを、1枚あたりの上限（高さ・面積）に収まる複数枚へ分割する。
+ * 上限内に収まる場合は1枚だけを返す。
+ */
+export function computeImageSplits(
+  totalWidth: number,
+  totalHeight: number,
+  maxHeight: number = MAX_IMAGE_HEIGHT_PX,
+  maxArea: number = MAX_IMAGE_AREA_PX,
+): ImageSplit[] {
+  if (totalWidth <= 0 || totalHeight <= 0) {
+    throw new Error(`画像の寸法が不正です: ${totalWidth}x${totalHeight}`);
+  }
+
+  const byArea = Math.floor(maxArea / totalWidth);
+  // 幅が極端に広い場合でも最低1pxは進めて無限ループを避ける
+  const limit = Math.max(1, Math.min(maxHeight, byArea));
+
+  const splits: ImageSplit[] = [];
+  for (let y = 0; y < totalHeight; y += limit) {
+    splits.push({ sourceY: y, height: Math.min(limit, totalHeight - y) });
+  }
+  return splits;
+}

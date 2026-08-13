@@ -21,11 +21,26 @@ export interface Measurement {
   dpr: number;
 }
 
-export async function prepareAndMeasure(): Promise<Measurement> {
+export async function prepareAndMeasure(preScroll: boolean): Promise<Measurement> {
   const STYLE_ID = 'makimono-scroll-reset';
   const LOADING_ATTR = 'data-makimono-loading';
   const DECODE_TIMEOUT_MS = 3000;
+  const PRE_SCROLL_MAX_STEPS = 300;
   const original = { scrollX: window.scrollX, scrollY: window.scrollY };
+
+  const measureHeight = (): number =>
+    Math.max(
+      document.documentElement.scrollHeight,
+      document.body ? document.body.scrollHeight : 0,
+      document.documentElement.offsetHeight,
+      document.body ? document.body.offsetHeight : 0,
+      document.documentElement.clientHeight,
+    );
+
+  const nextFrames = (): Promise<void> =>
+    new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
 
   if (!document.getElementById(STYLE_ID)) {
     const style = document.createElement('style');
@@ -35,37 +50,44 @@ export async function prepareAndMeasure(): Promise<Measurement> {
     document.documentElement.appendChild(style);
   }
 
-  // FR-04: lazy画像をeagerに切り替えてデコードを待つ。高さ計測より先に行うことで、
-  // デコードによるレイアウトシフトを計測に反映させる。
+  // FR-04: lazy画像をeagerに切り替える。元のloading値は属性に退避し、restorePageで戻す。
+  const lazyImages = Array.from(document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]'));
+  for (const img of lazyImages) {
+    if (!img.hasAttribute(LOADING_ATTR)) {
+      img.setAttribute(LOADING_ATTR, img.getAttribute('loading') ?? '');
+    }
+    img.loading = 'eager';
+  }
+
+  // FR-04（オプション）：先に一度ページ全体を流して、スクロール連動で読み込まれる画像を出させる。
+  // 無限スクロールでページが伸び続ける場合に止まらなくなるため、上限回数で必ず抜ける。
+  if (preScroll) {
+    let y = 0;
+    for (let i = 0; i < PRE_SCROLL_MAX_STEPS; i++) {
+      const limit = Math.max(0, measureHeight() - window.innerHeight);
+      if (y >= limit) break;
+      y = Math.min(y + window.innerHeight, limit);
+      window.scrollTo({ top: y, left: 0, behavior: 'instant' });
+      await nextFrames();
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    await nextFrames();
+  }
+
+  // デコード完了を待ってから高さを測る（デコードによるレイアウトシフトを計測に反映させるため）。
   // 取得が終わらない画像が1枚でもあると全体が固まるため、1枚ごとにタイムアウトと競わせる。
-  // 元のloading値は属性に退避し、restorePageで戻す。
-  const lazyImages = Array.from(
-    document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]'),
-  );
   await Promise.all(
-    lazyImages.map((img) => {
-      if (!img.hasAttribute(LOADING_ATTR)) {
-        img.setAttribute(LOADING_ATTR, img.getAttribute('loading') ?? '');
-      }
-      img.loading = 'eager';
-      return Promise.race([
+    lazyImages.map((img) =>
+      Promise.race([
         img.decode().catch(() => {}),
         new Promise<void>((resolve) => setTimeout(resolve, DECODE_TIMEOUT_MS)),
-      ]);
-    }),
-  );
-
-  const totalHeightCss = Math.max(
-    document.documentElement.scrollHeight,
-    document.body ? document.body.scrollHeight : 0,
-    document.documentElement.offsetHeight,
-    document.body ? document.body.offsetHeight : 0,
-    document.documentElement.clientHeight,
+      ]),
+    ),
   );
 
   return {
     original,
-    totalHeightCss,
+    totalHeightCss: measureHeight(),
     viewportWidthCss: window.innerWidth,
     viewportHeightCss: window.innerHeight,
     dpr: window.devicePixelRatio,
@@ -91,13 +113,14 @@ export function scrollAndSettle(y: number): Promise<{ scrollY: number; visible: 
   });
 }
 
-export function prepareOverlay(): void {
+// 表示文言はService Worker側でchrome.i18nから引いて渡す（注入先では自前の文言を持たない）
+export function prepareOverlay(label: string): void {
   const OVERLAY_ID = 'makimono-progress-overlay';
   if (document.getElementById(OVERLAY_ID)) return;
 
   const overlay = document.createElement('div');
   overlay.id = OVERLAY_ID;
-  overlay.textContent = '巻物 0%';
+  overlay.textContent = label;
   overlay.style.cssText = [
     'position: fixed',
     'right: 16px',
@@ -135,11 +158,11 @@ export function hideOverlay(): Promise<void> {
   });
 }
 
-export function showOverlayProgress(percent: number): void {
+export function showOverlayProgress(label: string): void {
   const OVERLAY_ID = 'makimono-progress-overlay';
   const overlay = document.getElementById(OVERLAY_ID);
   if (!overlay) return;
-  overlay.textContent = `巻物 ${percent}%`;
+  overlay.textContent = label;
   overlay.style.visibility = 'visible';
 }
 

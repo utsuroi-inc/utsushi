@@ -3,6 +3,8 @@
 // toDataURL は使わない（base64文字列がヒープに乗るため。長いページでは数百MBになる）。
 // 保存は <a download> + blob: URL。同一オリジンのblob:なので downloads 権限は不要。
 
+import { LocalizedError } from './i18n';
+
 // 発行済みObjectURLを保持し、一定時間後とページ離脱時に解放する。
 // ダウンロード直後に即revokeすると、進行中の保存が中断されうるため猶予を置く。
 const pendingUrls = new Set<string>();
@@ -28,8 +30,8 @@ export function canvasToBlob(
         if (blob) {
           resolve(blob);
         } else {
-          // 画像が大きすぎるとnullが返る。FR-07（巨大ページの分割）で緩和される
-          reject(new Error('画像が大きすぎて書き出せませんでした'));
+          // 画像が大きすぎるとnullが返る
+          reject(new LocalizedError('errorTooLarge', 'canvas.toBlob returned null'));
         }
       },
       type,
@@ -71,10 +73,9 @@ export function copyCanvasAsPng(canvas: HTMLCanvasElement): Promise<void> {
   return navigator.clipboard.write([item]);
 }
 
-export function describeCopyError(error: unknown): string {
+/** 文言そのものではなくメッセージキーを返す（UI文言は_locales側に集約するため） */
+export function copyErrorMessageKey(error: unknown): string {
   const name = error instanceof Error ? error.name : '';
-  if (name === 'NotAllowedError') {
-    return 'コピーできませんでした。このタブをクリックしてから、もう一度お試しください。';
-  }
-  return `コピーに失敗しました。${error instanceof Error ? error.message : ''}`;
+  // タブが背面だったりDevToolsにフォーカスがある場合はNotAllowedErrorになる
+  return name === 'NotAllowedError' ? 'errorCopyNotAllowed' : 'errorCopyFailed';
 }

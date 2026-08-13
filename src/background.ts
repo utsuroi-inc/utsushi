@@ -9,10 +9,8 @@ import {
 } from './lib/inject';
 import { computeScrollSteps } from './lib/geometry';
 import { appendSegment, saveSessionMeta, deleteSession, purgeStaleCaptures } from './lib/db';
-
-// FR-02.4: captureVisibleTabのレート制限（約2回/秒）を守るための最低間隔。
-// オプション化（既定600ms、200〜2000ms）はフェーズ4のスコープなので、ここでは固定値。
-const MIN_CAPTURE_INTERVAL_MS = 600;
+import { loadSettings, effectiveCaptureDelay } from './lib/settings';
+import { t } from './lib/i18n';
 
 interface CaptureState {
   cancelled: boolean;
@@ -94,10 +92,14 @@ async function runCapture(
 
   activeCaptureIds.add(captureId);
   try {
+    const settings = await loadSettings();
+    const captureIntervalMs = effectiveCaptureDelay(settings);
+
     injected = true; // ここから先はページに注入物が残りうるため、finallyで必ず復元を試みる
     const [measurementInjection] = await chrome.scripting.executeScript({
       target: { tabId },
       func: prepareAndMeasure,
+      args: [settings.preScroll],
     });
     const measurement = measurementInjection.result;
     if (!measurement) {
@@ -107,7 +109,11 @@ async function runCapture(
 
     const steps = computeScrollSteps(measurement.totalHeightCss, measurement.viewportHeightCss);
 
-    await chrome.scripting.executeScript({ target: { tabId }, func: prepareOverlay });
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      func: prepareOverlay,
+      args: [t('overlayProgress', ['0'])],
+    });
 
     const actualStepsCss: number[] = [];
 
@@ -116,7 +122,7 @@ async function runCapture(
         throw new CaptureCancelledError();
       }
 
-      if (i >= 1) {
+      if (settings.hideFixedElements && i >= 1) {
         // FR-03: 1枚目には固定要素を写し、2枚目以降では隠す。
         // 冪等なので毎ステップ呼び、撮影中に出現した固定要素（遅延バナー等）も拾う。
         await chrome.scripting.executeScript({ target: { tabId }, func: hideFixedElements });
@@ -141,7 +147,7 @@ async function runCapture(
 
       // レート制限の下限保証：計測起点をcaptureVisibleTab直前に置くことで、
       // scrollAndSettle等がどれだけ時間を使っても実効間隔が縮まないようにする。
-      const wait = MIN_CAPTURE_INTERVAL_MS - (Date.now() - lastCaptureAt);
+      const wait = captureIntervalMs - (Date.now() - lastCaptureAt);
       if (wait > 0) {
         await sleep(wait);
       }
@@ -161,7 +167,7 @@ async function runCapture(
       await chrome.scripting.executeScript({
         target: { tabId },
         func: showOverlayProgress,
-        args: [percent],
+        args: [t('overlayProgress', [String(percent)])],
       });
       await chrome.action.setBadgeText({ tabId, text: `${percent}%` });
     }
