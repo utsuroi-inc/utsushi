@@ -62,12 +62,12 @@ async function main(): Promise<void> {
     const segWidth = bitmaps[0].width;
     for (const bitmap of bitmaps) {
       if (bitmap.width !== segWidth) {
-        console.warn('[makimono] セグメント幅が揃っていません', { segWidth, actual: bitmap.width });
+        console.warn('[utsushi] セグメント幅が揃っていません', { segWidth, actual: bitmap.width });
       }
     }
     const expectedWidth = Math.round(meta.viewportWidthCss * meta.dpr);
     if (segWidth !== expectedWidth) {
-      console.warn('[makimono] 実測幅が理論値（viewportWidthCss×dpr）と異なります', {
+      console.warn('[utsushi] 実測幅が理論値（viewportWidthCss×dpr）と異なります', {
         segWidth,
         expectedWidth,
       });
@@ -124,7 +124,7 @@ async function main(): Promise<void> {
       },
     });
   } catch (error) {
-    console.error('[makimono] 合成に失敗しました', error);
+    console.error('[utsushi] 合成に失敗しました', error);
     if (ui.parts) ui.parts.hidden = true;
     showMessage(t('errorComposeFailed'));
   } finally {
@@ -274,7 +274,7 @@ function setUpExports(context: ResultContext): void {
     copyCanvasAsPng(image.canvases[0])
       .then(() => setStatus(t('statusCopied')))
       .catch((error: unknown) => {
-        console.error('[makimono] コピーに失敗しました', error);
+        console.error('[utsushi] コピーに失敗しました', error);
         setStatus(t(copyErrorMessageKey(error)));
       });
   });
@@ -330,7 +330,7 @@ async function runExport(pendingMessage: string, task: () => Promise<void>): Pro
     await task();
     setStatus(t('statusSaved'));
   } catch (error) {
-    console.error('[makimono] 書き出しに失敗しました', error);
+    console.error('[utsushi] 書き出しに失敗しました', error);
     // 内部エラーのmessageはそのまま出さない（_localesを通らず言語が混ざるため）
     setStatus(error instanceof LocalizedError ? t(error.messageKey) : t('errorExportFailed'));
   } finally {

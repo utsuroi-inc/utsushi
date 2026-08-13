@@ -2,7 +2,7 @@
 
 ## プロジェクト
 
-**巻物 / makimono** — Webページ全体を1枚の画像またはPDFとして保存するChrome拡張（Manifest V3）。
+**写し / utsushi** — Webページ全体を1枚の画像またはPDFとして保存するChrome拡張（Manifest V3）。
 
 - 仕様の正：`docs/requirements.md`
 - 進め方：`docs/development-plan.md`
@@ -34,7 +34,7 @@ npm run typecheck  # 型チェック
 
 ### 2. 商標に触れる語を使わない
 
-`FullPage` / `Full Page` / `GoFullPage` を、名称・ファイル名・クラス名・変数名・コメント・ドキュメントのいずれにも使わない。`GOFULLPAGE` は Full Page LLC の登録商標。命名はすべて `makimono` 系で統一する。
+`FullPage` / `Full Page` / `GoFullPage` を、名称・ファイル名・クラス名・変数名・コメント・ドキュメントのいずれにも使わない。`GOFULLPAGE` は Full Page LLC の登録商標。命名はすべて `utsushi` 系で統一する。
 
 ### 3. 権限を勝手に追加しない
 

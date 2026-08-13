@@ -85,7 +85,7 @@ async function showCurrentShortcut(): Promise<void> {
     const shortcut = commands.find((command) => command.name === '_execute_action')?.shortcut;
     fields.shortcut.textContent = shortcut && shortcut.length > 0 ? shortcut : t('optionsShortcutNone');
   } catch (error) {
-    console.error('[makimono] ショートカットの取得に失敗しました', error);
+    console.error('[utsushi] ショートカットの取得に失敗しました', error);
     fields.shortcut.textContent = t('optionsShortcutNone');
   }
 }
@@ -147,7 +147,7 @@ async function persist(): Promise<void> {
     notifySaved();
   } catch (error) {
     // 保存できなかったことを黙って握りつぶさない
-    console.error('[makimono] 設定の保存に失敗しました', error);
+    console.error('[utsushi] 設定の保存に失敗しました', error);
     if (fields.saved) {
       fields.saved.textContent = t('optionsSaveFailed');
       fields.saved.classList.add('visible');

@@ -72,7 +72,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 async function handleClick(tab: chrome.tabs.Tab): Promise<void> {
   if (tab.id === undefined || tab.windowId === undefined) {
-    console.error('[makimono] tab.id または windowId が取得できませんでした');
+    console.error('[utsushi] tab.id または windowId が取得できませんでした');
     return;
   }
   const tabId = tab.id;
@@ -110,7 +110,7 @@ async function handleClick(tab: chrome.tabs.Tab): Promise<void> {
  * ページ内へ入れる場合はトーストも出す。
  */
 async function reportError(tabId: number, message: string): Promise<void> {
-  console.error('[makimono]', message);
+  console.error('[utsushi]', message);
 
   await chrome.action.setBadgeText({ tabId, text: ERROR_BADGE }).catch(() => {});
   await chrome.action.setBadgeBackgroundColor({ tabId, color: ERROR_BADGE_COLOR }).catch(() => {});
@@ -268,9 +268,9 @@ async function runCapture(
     succeeded = true;
   } catch (error) {
     if (error instanceof CaptureCancelledError) {
-      console.log('[makimono] キャプチャをキャンセルしました');
+      console.log('[utsushi] キャプチャをキャンセルしました');
     } else {
-      console.error('[makimono] 全ページキャプチャに失敗しました', error);
+      console.error('[utsushi] 全ページキャプチャに失敗しました', error);
       failureMessage = describeFailure(error, tabUrl);
     }
   } finally {
@@ -283,7 +283,7 @@ async function runCapture(
       // originalがnullでも注入済みスタイル・属性の復元は必要（restorePage側がnullを許容する）
       await chrome.scripting
         .executeScript({ target: { tabId }, func: restorePage, args: [original] })
-        .catch((error) => console.error('[makimono] ページ状態の復元に失敗しました', error));
+        .catch((error) => console.error('[utsushi] ページ状態の復元に失敗しました', error));
     }
     await chrome.action.setBadgeText({ tabId, text: '' }).catch(() => {});
 
@@ -322,7 +322,7 @@ async function captureWithRetry(windowId: number, intervalMs: number): Promise<s
   } catch (error) {
     if (!isQuotaError(error)) throw error;
 
-    console.warn('[makimono] キャプチャのクォータを超過しました。待機して再試行します');
+    console.warn('[utsushi] キャプチャのクォータを超過しました。待機して再試行します');
     await sleep(intervalMs * 2);
 
     lastCaptureAt = Date.now();

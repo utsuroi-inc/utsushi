@@ -68,7 +68,7 @@ export async function loadSettings(): Promise<Settings> {
     return normalize(stored[STORAGE_KEY]);
   } catch (error) {
     // 設定が読めなくても撮影自体は続けられるべきなので既定値で進む
-    console.error('[makimono] 設定の読み込みに失敗しました', error);
+    console.error('[utsushi] 設定の読み込みに失敗しました', error);
     return { ...DEFAULT_SETTINGS };
   }
 }

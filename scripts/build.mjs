@@ -35,7 +35,7 @@ async function copyStaticAssets() {
   await copyDir(path.join(root, 'licenses'), path.join(distDir, 'licenses'));
 }
 
-// jsPDFがhtml()用に動的importしているレンダラ群。巻物はcanvasから直接PDFを作るため
+// jsPDFがhtml()用に動的importしているレンダラ群。写しはcanvasから直接PDFを作るため
 // 使わないが、放置するとバンドルに取り込まれて1.5MBまで膨らむ（core-js等を巻き込むため）。
 // 空モジュールに差し替えて締め出す。html()を呼ばない限り実行時に参照されない。
 const excludeUnusedJsPdfRenderers = {
@@ -44,9 +44,9 @@ const excludeUnusedJsPdfRenderers = {
     const pattern = /^(canvg|dompurify|html2canvas)$/;
     build.onResolve({ filter: pattern }, (args) => ({
       path: args.path,
-      namespace: 'makimono-stub',
+      namespace: 'utsushi-stub',
     }));
-    build.onLoad({ filter: /.*/, namespace: 'makimono-stub' }, () => ({
+    build.onLoad({ filter: /.*/, namespace: 'utsushi-stub' }, () => ({
       contents: 'export default undefined;',
       loader: 'js',
     }));
@@ -54,7 +54,7 @@ const excludeUnusedJsPdfRenderers = {
 };
 
 // jsPDFのoutput('pdfobjectnewwindow')は、PDFプレビュー用にCDNのスクリプトを読み込む。
-// 巻物はoutput('blob')しか使わないため実行されないが、外部URLが配布物に残っていると
+// 写しはoutput('blob')しか使わないため実行されないが、外部URLが配布物に残っていると
 // 「通信ゼロ」（NFR-01）をgrepで確認できなくなるので、ビルド時に空文字へ潰しておく。
 const stripRemoteScriptUrl = {
   name: 'strip-remote-script-url',

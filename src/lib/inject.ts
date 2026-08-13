@@ -8,11 +8,11 @@
 // 出ない）ため、IDは各関数内に文字列リテラルで直書きする。
 //
 // 使用しているリテラル一覧（変更時は全関数を目視で突き合わせること）：
-//   スタイル要素ID:        'makimono-scroll-reset'
-//   オーバーレイ要素ID:    'makimono-progress-overlay'
-//   トースト要素ID:        'makimono-toast'（showToast と prepareAndMeasure が参照）
-//   visibility退避属性:    'data-makimono-hidden'
-//   loading退避属性:       'data-makimono-loading'
+//   スタイル要素ID:        'utsushi-scroll-reset'
+//   オーバーレイ要素ID:    'utsushi-progress-overlay'
+//   トースト要素ID:        'utsushi-toast'（showToast と prepareAndMeasure が参照）
+//   visibility退避属性:    'data-utsushi-hidden'
+//   loading退避属性:       'data-utsushi-loading'
 
 export interface Measurement {
   original: { scrollX: number; scrollY: number };
@@ -23,10 +23,10 @@ export interface Measurement {
 }
 
 export async function prepareAndMeasure(preScroll: boolean): Promise<Measurement> {
-  const STYLE_ID = 'makimono-scroll-reset';
-  const LOADING_ATTR = 'data-makimono-loading';
+  const STYLE_ID = 'utsushi-scroll-reset';
+  const LOADING_ATTR = 'data-utsushi-loading';
   const DECODE_TIMEOUT_MS = 3000;
-  const TOAST_ID = 'makimono-toast';
+  const TOAST_ID = 'utsushi-toast';
   const PRE_SCROLL_MAX_STEPS = 300;
   const original = { scrollX: window.scrollX, scrollY: window.scrollY };
 
@@ -120,7 +120,7 @@ export function scrollAndSettle(y: number): Promise<{ scrollY: number; visible: 
 
 // 表示文言はService Worker側でchrome.i18nから引いて渡す（注入先では自前の文言を持たない）
 export function prepareOverlay(label: string): void {
-  const OVERLAY_ID = 'makimono-progress-overlay';
+  const OVERLAY_ID = 'utsushi-progress-overlay';
   if (document.getElementById(OVERLAY_ID)) return;
 
   const overlay = document.createElement('div');
@@ -146,7 +146,7 @@ export function prepareOverlay(label: string): void {
 // バックグラウンド時のタイムアウトフォールバック）。
 // これを省くと、特にレート制限待ちが発生しない1枚目でオーバーレイが写り込む。
 export function hideOverlay(): Promise<void> {
-  const OVERLAY_ID = 'makimono-progress-overlay';
+  const OVERLAY_ID = 'utsushi-progress-overlay';
   return new Promise((resolve) => {
     const overlay = document.getElementById(OVERLAY_ID);
     if (overlay) overlay.style.visibility = 'hidden';
@@ -164,7 +164,7 @@ export function hideOverlay(): Promise<void> {
 }
 
 export function showOverlayProgress(label: string): void {
-  const OVERLAY_ID = 'makimono-progress-overlay';
+  const OVERLAY_ID = 'utsushi-progress-overlay';
   const overlay = document.getElementById(OVERLAY_ID);
   if (!overlay) return;
   overlay.textContent = label;
@@ -175,7 +175,7 @@ export function showOverlayProgress(label: string): void {
 // 通知APIではなく自前の小さなカードを使う。文言はService Worker側で解決して渡す。
 // 復元処理より後に呼ぶこと（restorePageは自分の注入物を消すため）。
 export function showToast(message: string): void {
-  const TOAST_ID = 'makimono-toast';
+  const TOAST_ID = 'utsushi-toast';
   const VISIBLE_MS = 6000;
 
   document.getElementById(TOAST_ID)?.remove();
@@ -210,8 +210,8 @@ export function showToast(message: string): void {
 // FR-03: 2枚目以降のセグメントに固定要素が重複して写らないよう隠す（1枚目には写す）。
 // 冪等（退避済み要素はスキップ）なので、撮影中に出現した固定要素を拾うため毎ステップ呼んでよい。
 export function hideFixedElements(): void {
-  const OVERLAY_ID = 'makimono-progress-overlay';
-  const HIDDEN_ATTR = 'data-makimono-hidden';
+  const OVERLAY_ID = 'utsushi-progress-overlay';
+  const HIDDEN_ATTR = 'data-utsushi-hidden';
   const overlay = document.getElementById(OVERLAY_ID);
 
   document.querySelectorAll<HTMLElement>('*').forEach((el) => {
@@ -236,21 +236,21 @@ export function hideFixedElements(): void {
 // NFR-05: どこか1箇所の復元が失敗しても他の復元を道連れにしないよう、各処理を独立させる。
 // originalがnull（測定に失敗した等）でも、注入済みのスタイル・属性の復元は常に行う。
 export function restorePage(original: { scrollX: number; scrollY: number } | null): void {
-  const STYLE_ID = 'makimono-scroll-reset';
-  const OVERLAY_ID = 'makimono-progress-overlay';
-  const HIDDEN_ATTR = 'data-makimono-hidden';
-  const LOADING_ATTR = 'data-makimono-loading';
+  const STYLE_ID = 'utsushi-scroll-reset';
+  const OVERLAY_ID = 'utsushi-progress-overlay';
+  const HIDDEN_ATTR = 'data-utsushi-hidden';
+  const LOADING_ATTR = 'data-utsushi-loading';
 
   try {
     document.getElementById(STYLE_ID)?.remove();
   } catch (e) {
-    console.error('[makimono] スタイル要素の削除に失敗しました', e);
+    console.error('[utsushi] スタイル要素の削除に失敗しました', e);
   }
 
   try {
     document.getElementById(OVERLAY_ID)?.remove();
   } catch (e) {
-    console.error('[makimono] オーバーレイの削除に失敗しました', e);
+    console.error('[utsushi] オーバーレイの削除に失敗しました', e);
   }
 
   try {
@@ -259,7 +259,7 @@ export function restorePage(original: { scrollX: number; scrollY: number } | nul
       el.removeAttribute(HIDDEN_ATTR);
     });
   } catch (e) {
-    console.error('[makimono] 固定要素の可視性復元に失敗しました', e);
+    console.error('[utsushi] 固定要素の可視性復元に失敗しました', e);
   }
 
   try {
@@ -273,7 +273,7 @@ export function restorePage(original: { scrollX: number; scrollY: number } | nul
       img.removeAttribute(LOADING_ATTR);
     });
   } catch (e) {
-    console.error('[makimono] 画像loading属性の復元に失敗しました', e);
+    console.error('[utsushi] 画像loading属性の復元に失敗しました', e);
   }
 
   try {
@@ -281,6 +281,6 @@ export function restorePage(original: { scrollX: number; scrollY: number } | nul
       window.scrollTo({ top: original.scrollY, left: original.scrollX, behavior: 'instant' });
     }
   } catch (e) {
-    console.error('[makimono] スクロール位置の復元に失敗しました', e);
+    console.error('[utsushi] スクロール位置の復元に失敗しました', e);
   }
 }

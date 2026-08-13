@@ -19,7 +19,7 @@ export function t(key: string, substitutions?: string[]): string {
   const message = chrome.i18n.getMessage(key, substitutions);
   // キー名の打ち間違いは空文字が返るだけで気付きにくいため、開発時に見えるようにする
   if (!message) {
-    console.warn('[makimono] 未定義のメッセージキー:', key);
+    console.warn('[utsushi] 未定義のメッセージキー:', key);
     return key;
   }
   return message;

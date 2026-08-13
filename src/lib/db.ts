@@ -8,7 +8,7 @@
 // 各トランザクションにはonerrorに加えonabortも張る。エラーイベントを伴わないabortで
 // Promiseが永久未解決になると、呼び出し側のキャプチャループごと固まるため。
 
-const DB_NAME = 'makimono';
+const DB_NAME = 'utsushi';
 const DB_VERSION = 2;
 const SESSIONS_STORE = 'sessions';
 const SEGMENTS_STORE = 'segments';

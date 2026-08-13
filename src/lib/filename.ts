@@ -10,7 +10,7 @@ const WHITESPACE_RUNS = /\s+/g;
 const TRAILING_DOTS_SPACES = /[. ]+$/;
 const WINDOWS_RESERVED = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
 
-const FALLBACK_NAME = 'makimono';
+const FALLBACK_NAME = 'utsushi';
 const TITLE_MAX_CODE_POINTS = 60;
 const TITLE_MAX_BYTES = 150;
 const FILENAME_MAX_BYTES = 200;

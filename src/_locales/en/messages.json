@@ -1,12 +1,12 @@
 {
-  "extName": { "message": "Makimono" },
+  "extName": { "message": "Utsushi" },
   "extDescription": { "message": "Save an entire web page as a single image or PDF" },
 
-  "brand": { "message": "Makimono" },
-  "resultTitle": { "message": "Makimono - Capture result" },
+  "brand": { "message": "Utsushi" },
+  "resultTitle": { "message": "Utsushi - Capture result" },
 
   "overlayProgress": {
-    "message": "Makimono $PERCENT$%",
+    "message": "Utsushi $PERCENT$%",
     "placeholders": { "percent": { "content": "$1", "example": "40" } }
   },
 
@@ -67,13 +67,13 @@
   "errorBlockedInternal": { "message": "Chrome's internal pages cannot be captured. Open a regular web page and try again." },
   "errorBlockedWebStore": { "message": "Pages on the Chrome Web Store cannot be captured." },
   "errorBlockedScheme": { "message": "This page cannot be captured." },
-  "errorBlockedFile": { "message": "Could not capture the local file. Open chrome://extensions, click Details on Makimono, and check that \"Allow access to file URLs\" is on. Some files, such as PDFs, cannot be captured even then." },
+  "errorBlockedFile": { "message": "Could not capture the local file. Open chrome://extensions, click Details on Utsushi, and check that \"Allow access to file URLs\" is on. Some files, such as PDFs, cannot be captured even then." },
   "errorCaptureFailed": { "message": "Could not capture the page. Reload it and try again." },
   "errorTabChanged": { "message": "Capture stopped because the tab changed. Keep that tab in front while capturing." },
   "errorQuotaExceeded": { "message": "Captures are happening too quickly. Increase the delay in the settings and try again." },
   "errorPageTooTall": { "message": "This page is too long to capture." },
 
-  "optionsTitle": { "message": "Makimono settings" },
+  "optionsTitle": { "message": "Utsushi settings" },
   "optionsHeading": { "message": "Settings" },
   "optionsSectionCapture": { "message": "Capture" },
   "optionsSectionExport": { "message": "Export" },

@@ -142,7 +142,7 @@ export async function buildPdfBlob(
       const blob = await canvasToBlob(source, 'image/jpeg', quality);
       const bytes = new Uint8Array(await blob.arrayBuffer());
       // aliasを渡さないとjsPDFが画像バイト列全体をハッシュして重複検出する（数MBでは無駄）
-      doc.addImage(bytes, 'JPEG', 0, 0, widthPt, imageHeightPt, `makimono-page-${i}`);
+      doc.addImage(bytes, 'JPEG', 0, 0, widthPt, imageHeightPt, `utsushi-page-${i}`);
     }
 
     if (!doc) {
