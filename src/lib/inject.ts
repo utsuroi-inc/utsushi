@@ -10,6 +10,7 @@
 // 使用しているリテラル一覧（変更時は全関数を目視で突き合わせること）：
 //   スタイル要素ID:        'makimono-scroll-reset'
 //   オーバーレイ要素ID:    'makimono-progress-overlay'
+//   トースト要素ID:        'makimono-toast'（showToast と prepareAndMeasure が参照）
 //   visibility退避属性:    'data-makimono-hidden'
 //   loading退避属性:       'data-makimono-loading'
 
@@ -25,8 +26,12 @@ export async function prepareAndMeasure(preScroll: boolean): Promise<Measurement
   const STYLE_ID = 'makimono-scroll-reset';
   const LOADING_ATTR = 'data-makimono-loading';
   const DECODE_TIMEOUT_MS = 3000;
+  const TOAST_ID = 'makimono-toast';
   const PRE_SCROLL_MAX_STEPS = 300;
   const original = { scrollX: window.scrollX, scrollY: window.scrollY };
+
+  // 直前の失敗トーストが残っていると1枚目に写り込むため、撮影開始時に必ず消す
+  document.getElementById(TOAST_ID)?.remove();
 
   const measureHeight = (): number =>
     Math.max(
@@ -164,6 +169,42 @@ export function showOverlayProgress(label: string): void {
   if (!overlay) return;
   overlay.textContent = label;
   overlay.style.visibility = 'visible';
+}
+
+// §8.3: 失敗の理由をページ上に短く出す。notifications権限を増やさずに済ませるため、
+// 通知APIではなく自前の小さなカードを使う。文言はService Worker側で解決して渡す。
+// 復元処理より後に呼ぶこと（restorePageは自分の注入物を消すため）。
+export function showToast(message: string): void {
+  const TOAST_ID = 'makimono-toast';
+  const VISIBLE_MS = 6000;
+
+  document.getElementById(TOAST_ID)?.remove();
+
+  const toast = document.createElement('div');
+  toast.id = TOAST_ID;
+  toast.textContent = message;
+  toast.style.cssText = [
+    'position: fixed',
+    'right: 16px',
+    'bottom: 16px',
+    'z-index: 2147483647',
+    'max-width: 320px',
+    'padding: 12px 16px',
+    'border-radius: 8px',
+    'background: rgba(28, 26, 23, 0.92)',
+    'color: #fafaf7',
+    'font: 13px/1.5 system-ui, sans-serif',
+    'box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3)',
+    'pointer-events: none',
+    'white-space: pre-wrap',
+  ].join('; ');
+  document.documentElement.appendChild(toast);
+
+  setTimeout(() => {
+    // 別の撮影で新しいトーストに差し替わっている場合は消さない
+    const current = document.getElementById(TOAST_ID);
+    if (current === toast) current.remove();
+  }, VISIBLE_MS);
 }
 
 // FR-03: 2枚目以降のセグメントに固定要素が重複して写らないよう隠す（1枚目には写す）。

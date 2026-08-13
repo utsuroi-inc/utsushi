@@ -9,6 +9,7 @@
 
 import { jsPDF } from 'jspdf';
 import { canvasToBlob } from './exporters';
+import { MAX_IMAGE_AREA_PX, MAX_IMAGE_HEIGHT_PX } from './geometry';
 import type { PdfPaper } from './settings';
 
 // PDFの1辺の仕様上限は14,400pt。jsPDFは超過分を警告付きで黙って切り詰めるため、
@@ -83,10 +84,17 @@ export async function buildPdfBlob(
 
   // 1ページに載せられる高さ（実ピクセル換算）
   const maxPageHeightPt = paper === 'a4' ? A4_HEIGHT_PT : PDF_MAX_PAGE_PT;
-  const sliceHeightPx = Math.max(
+  const byPageLimit = Math.max(
     1,
     Math.floor((maxPageHeightPt / (PT_PER_CSS_PX * fit)) * image.scale),
   );
+  // 一時canvasにも合成側と同じ安全上限を掛ける。PDFの寸法上限だけで決めると、
+  // Retinaの長いページで一時canvasが合成側の上限を大きく超え、書き出しに失敗しうる。
+  const byCanvasLimit = Math.max(
+    1,
+    Math.min(MAX_IMAGE_HEIGHT_PX, Math.floor(MAX_IMAGE_AREA_PX / image.width)),
+  );
+  const sliceHeightPx = Math.min(byPageLimit, byCanvasLimit);
 
   const slices: Array<{ sourceY: number; height: number }> = [];
   for (let y = 0; y < image.height; y += sliceHeightPx) {

@@ -24,9 +24,15 @@ const fields = {
   reset: document.getElementById('reset') as HTMLButtonElement,
   saved: document.getElementById('saved'),
   licenses: document.getElementById('licenses') as HTMLAnchorElement | null,
+  shortcut: document.getElementById('shortcut'),
 };
 
+// storage.syncには1分あたりの書き込み回数制限がある。スライダーを1回ドラッグすると
+// inputイベントが数十回飛ぶため、そのまま書くと上限に当たって保存が黙って失敗する。
+const PERSIST_DEBOUNCE_MS = 400;
+
 let savedTimer: number | undefined;
+let persistTimer: number | undefined;
 
 applyI18n();
 void init();
@@ -35,6 +41,7 @@ async function init(): Promise<void> {
   if (fields.licenses) {
     fields.licenses.href = chrome.runtime.getURL('licenses/README.md');
   }
+  await showCurrentShortcut();
   applyToForm(await loadSettings());
 
   for (const input of [
@@ -48,9 +55,18 @@ async function init(): Promise<void> {
   ]) {
     input.addEventListener('input', () => {
       refreshLabels();
-      void persist();
+      schedulePersist();
     });
   }
+
+  // 変更直後にタブを閉じても取りこぼさない
+  window.addEventListener('pagehide', () => {
+    if (persistTimer !== undefined) {
+      window.clearTimeout(persistTimer);
+      persistTimer = undefined;
+      void persist();
+    }
+  });
 
   fields.reset.addEventListener('click', () => {
     void (async () => {
@@ -59,6 +75,19 @@ async function init(): Promise<void> {
       notifySaved();
     })();
   });
+}
+
+/** 実際に割り当てられているキーを表示する（利用者が変更していれば既定とは違うため） */
+async function showCurrentShortcut(): Promise<void> {
+  if (!fields.shortcut) return;
+  try {
+    const commands = await chrome.commands.getAll();
+    const shortcut = commands.find((command) => command.name === '_execute_action')?.shortcut;
+    fields.shortcut.textContent = shortcut && shortcut.length > 0 ? shortcut : t('optionsShortcutNone');
+  } catch (error) {
+    console.error('[makimono] ショートカットの取得に失敗しました', error);
+    fields.shortcut.textContent = t('optionsShortcutNone');
+  }
 }
 
 function applyToForm(settings: Settings): void {
@@ -104,13 +133,31 @@ function refreshLabels(): void {
   }
 }
 
+function schedulePersist(): void {
+  window.clearTimeout(persistTimer);
+  persistTimer = window.setTimeout(() => {
+    persistTimer = undefined;
+    void persist();
+  }, PERSIST_DEBOUNCE_MS);
+}
+
 async function persist(): Promise<void> {
-  await saveSettings(readForm());
-  notifySaved();
+  try {
+    await saveSettings(readForm());
+    notifySaved();
+  } catch (error) {
+    // 保存できなかったことを黙って握りつぶさない
+    console.error('[makimono] 設定の保存に失敗しました', error);
+    if (fields.saved) {
+      fields.saved.textContent = t('optionsSaveFailed');
+      fields.saved.classList.add('visible');
+    }
+  }
 }
 
 function notifySaved(): void {
   if (!fields.saved) return;
+  fields.saved.textContent = t('optionsSaved');
   fields.saved.classList.add('visible');
   window.clearTimeout(savedTimer);
   savedTimer = window.setTimeout(() => {
