@@ -1,0 +1,109 @@
+{
+  "extName": { "message": "Utsushi" },
+  "extDescription": { "message": "Save an entire web page as a single image or PDF" },
+
+  "brand": { "message": "Utsushi" },
+  "resultTitle": { "message": "Utsushi - Capture result" },
+
+  "overlayProgress": {
+    "message": "Utsushi $PERCENT$%",
+    "placeholders": { "percent": { "content": "$1", "example": "40" } }
+  },
+
+  "dimensions": {
+    "message": "$WIDTH$ × $HEIGHT$ px",
+    "placeholders": {
+      "width": { "content": "$1", "example": "1,440" },
+      "height": { "content": "$2", "example": "24,300" }
+    }
+  },
+  "dimensionsActual": {
+    "message": "(actual $WIDTH$ × $HEIGHT$)",
+    "placeholders": {
+      "width": { "content": "$1", "example": "2,880" },
+      "height": { "content": "$2", "example": "48,600" }
+    }
+  },
+  "splitNotice": {
+    "message": "The image was split into $COUNT$ parts because of its size. The PDF is still a single file.",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "partLabel": {
+    "message": "$INDEX$ of $TOTAL$",
+    "placeholders": {
+      "index": { "content": "$1", "example": "1" },
+      "total": { "content": "$2", "example": "3" }
+    }
+  },
+
+  "zoomActual": { "message": "Actual size" },
+  "zoomFit": { "message": "Fit to window" },
+  "btnPng": { "message": "PNG" },
+  "btnJpeg": { "message": "JPEG" },
+  "btnPdf": { "message": "PDF" },
+  "btnCopy": { "message": "Copy" },
+  "btnSavePart": { "message": "Save this part" },
+
+  "statusSavingPng": { "message": "Saving PNG…" },
+  "statusSavingJpeg": { "message": "Saving JPEG…" },
+  "statusSavingPdf": { "message": "Building PDF…" },
+  "statusSavingPart": {
+    "message": "Saving part $INDEX$…",
+    "placeholders": { "index": { "content": "$1", "example": "2" } }
+  },
+  "statusSaved": { "message": "Saved" },
+  "statusCopying": { "message": "Copying to clipboard…" },
+  "statusCopied": { "message": "Copied to clipboard" },
+
+  "errorNoId": { "message": "No image ID was given." },
+  "errorNotFound": { "message": "The image was not found. Please capture again." },
+  "errorComposeFailed": { "message": "Could not assemble the image. Please capture again." },
+  "errorTooLarge": { "message": "The image is too large to export." },
+  "errorExportFailed": { "message": "Export failed." },
+  "errorCopyNotAllowed": { "message": "Could not copy. Click this tab, then try again." },
+  "errorCopyFailed": { "message": "Copy failed." },
+  "errorCopySplit": { "message": "A split image cannot be copied as one. Save the parts individually, or use the PDF." },
+
+  "errorBlockedInternal": { "message": "Chrome's internal pages cannot be captured. Open a regular web page and try again." },
+  "errorBlockedWebStore": { "message": "Pages on the Chrome Web Store cannot be captured." },
+  "errorBlockedScheme": { "message": "This page cannot be captured." },
+  "errorBlockedFile": { "message": "Could not capture the local file. Open chrome://extensions, click Details on Utsushi, and check that \"Allow access to file URLs\" is on. Some files, such as PDFs, cannot be captured even then." },
+  "errorCaptureFailed": { "message": "Could not capture the page. Reload it and try again." },
+  "errorTabChanged": { "message": "Capture stopped because the tab changed. Keep that tab in front while capturing." },
+  "errorQuotaExceeded": { "message": "Captures are happening too quickly. Increase the delay in the settings and try again." },
+  "errorPageTooTall": { "message": "This page is too long to capture." },
+
+  "optionsTitle": { "message": "Utsushi settings" },
+  "optionsHeading": { "message": "Settings" },
+  "optionsSectionCapture": { "message": "Capture" },
+  "optionsSectionExport": { "message": "Export" },
+  "optionsImageFormat": { "message": "Image format" },
+  "optionsImageFormatHint": { "message": "Used by \"Save this part\" when the image is split. The PNG and JPEG buttons above always use their own format." },
+  "optionsSaveFailed": { "message": "Could not save" },
+  "optionsFormatPng": { "message": "PNG (lossless, larger files)" },
+  "optionsFormatJpeg": { "message": "JPEG (smaller)" },
+  "optionsJpegQuality": { "message": "JPEG quality" },
+  "optionsCaptureDelay": { "message": "Delay between captures" },
+  "optionsCaptureDelayHint": { "message": "Wait time per screenful. Increase it if the seams are misaligned (500ms minimum applies)." },
+  "optionsHideFixed": { "message": "Hide fixed headers automatically" },
+  "optionsHideFixedHint": { "message": "Hides fixed elements after the first screenful so the same header is not repeated." },
+  "optionsPreScroll": { "message": "Scroll through the page once before capturing" },
+  "optionsPreScrollHint": { "message": "Helps when lazy-loaded images are missing. Capturing takes longer." },
+  "optionsPdfPaper": { "message": "PDF paper" },
+  "optionsPdfPaperImage": { "message": "Image size (one tall page)" },
+  "optionsPdfPaperA4": { "message": "Split into A4 portrait" },
+  "optionsFilenameTemplate": { "message": "File name" },
+  "optionsFilenameHint": { "message": "Placeholders: {title} page title / {url_host} domain / {yyyyMMdd-HHmmss} capture time" },
+  "optionsFilenamePreview": {
+    "message": "Example: $NAME$",
+    "placeholders": { "name": { "content": "$1", "example": "Article_20260813-142530.png" } }
+  },
+  "optionsShortcut": { "message": "Keyboard shortcut" },
+  "optionsShortcutNone": { "message": "Not set" },
+  "optionsShortcutHint": { "message": "To change it, open chrome://extensions/shortcuts (paste it into the address bar)." },
+  "optionsSaved": { "message": "Saved" },
+  "optionsReset": { "message": "Reset to defaults" },
+  "optionsLicenses": { "message": "Bundled libraries and licenses" },
+
+  "unitMs": { "message": "ms" }
+}

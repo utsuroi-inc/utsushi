@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja" data-i18n-document-title="resultTitle">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>utsushi</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fafaf7;
+    --fg: #222;
+    --muted: #6b6660;
+    --line: #d9d4cb;
+    --surface: rgba(250, 250, 247, 0.92);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1a17;
+      --fg: #eee;
+      --muted: #a09a91;
+      --line: #3a352f;
+      --surface: rgba(28, 26, 23, 0.92);
+    }
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Hiragino Sans", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  #bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--surface);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  #bar-left {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 14px;
+  }
+  #dimensions {
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  #bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  button {
+    font: inherit;
+    font-size: 13px;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) {
+    border-color: var(--muted);
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .sep {
+    width: 1px;
+    height: 20px;
+    background: var(--line);
+    margin: 0 4px;
+  }
+
+  #status,
+  #message,
+  #split-notice {
+    margin: 0;
+    padding: 12px 24px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  #parts {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .part {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .part-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .part-canvas-wrap {
+    overflow-x: auto;
+  }
+  .part canvas {
+    display: block;
+    max-width: 100%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+  .part canvas.actual-size {
+    max-width: none;
+  }
+</style>
+</head>
+<body>
+  <header id="bar">
+    <div id="bar-left">
+      <span data-i18n="brand"></span>
+      <span id="dimensions"></span>
+    </div>
+    <div id="bar-right">
+      <button id="btn-zoom" data-i18n="zoomActual" disabled></button>
+      <span class="sep"></span>
+      <button id="btn-png" data-i18n="btnPng" disabled></button>
+      <button id="btn-jpeg" data-i18n="btnJpeg" disabled></button>
+      <button id="btn-pdf" data-i18n="btnPdf" disabled></button>
+      <button id="btn-copy" data-i18n="btnCopy" disabled></button>
+    </div>
+  </header>
+  <p id="split-notice" hidden></p>
+  <p id="status" aria-live="polite" hidden></p>
+  <p id="message" hidden></p>
+  <div id="parts"></div>
+  <script src="result.js"></script>
+</body>
+</html>

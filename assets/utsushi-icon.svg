@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="写し icon">
+  <rect width="128" height="128" fill="#f8f6f0"/>
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="#faf9f5" stroke="#624b37" stroke-width="5"/>
+  <rect x="39" y="24" width="50" height="80" rx="8" fill="#fffffd" stroke="#624b37" stroke-width="4"/>
+  <path d="M47 43h34M47 55h29M47 67h34M47 79h23" stroke="#99826c" stroke-width="4"/>
+  <path d="M37 22H24v13M91 106h13V93" fill="none" stroke="#75502e" stroke-width="5"/>
+  <path d="M64 92l-7-8h4v-6h6v6h4z" fill="#75502e"/>
+</svg>

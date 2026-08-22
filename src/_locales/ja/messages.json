@@ -1,0 +1,109 @@
+{
+  "extName": { "message": "写し" },
+  "extDescription": { "message": "Webページ全体を1枚の画像またはPDFとして保存します" },
+
+  "brand": { "message": "写し" },
+  "resultTitle": { "message": "写し - キャプチャ結果" },
+
+  "overlayProgress": {
+    "message": "写し $PERCENT$%",
+    "placeholders": { "percent": { "content": "$1", "example": "40" } }
+  },
+
+  "dimensions": {
+    "message": "$WIDTH$ × $HEIGHT$ px",
+    "placeholders": {
+      "width": { "content": "$1", "example": "1,440" },
+      "height": { "content": "$2", "example": "24,300" }
+    }
+  },
+  "dimensionsActual": {
+    "message": "（実寸 $WIDTH$ × $HEIGHT$）",
+    "placeholders": {
+      "width": { "content": "$1", "example": "2,880" },
+      "height": { "content": "$2", "example": "48,600" }
+    }
+  },
+  "splitNotice": {
+    "message": "画像が大きいため $COUNT$ 枚に分割しました。PDFは1つのファイルにまとまります。",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "partLabel": {
+    "message": "$INDEX$ / $TOTAL$",
+    "placeholders": {
+      "index": { "content": "$1", "example": "1" },
+      "total": { "content": "$2", "example": "3" }
+    }
+  },
+
+  "zoomActual": { "message": "等倍で表示" },
+  "zoomFit": { "message": "全体を表示" },
+  "btnPng": { "message": "PNG" },
+  "btnJpeg": { "message": "JPEG" },
+  "btnPdf": { "message": "PDF" },
+  "btnCopy": { "message": "コピー" },
+  "btnSavePart": { "message": "この部分を保存" },
+
+  "statusSavingPng": { "message": "PNGを書き出し中…" },
+  "statusSavingJpeg": { "message": "JPEGを書き出し中…" },
+  "statusSavingPdf": { "message": "PDFを作成中…" },
+  "statusSavingPart": {
+    "message": "$INDEX$ 枚目を書き出し中…",
+    "placeholders": { "index": { "content": "$1", "example": "2" } }
+  },
+  "statusSaved": { "message": "保存しました" },
+  "statusCopying": { "message": "クリップボードにコピー中…" },
+  "statusCopied": { "message": "クリップボードにコピーしました" },
+
+  "errorNoId": { "message": "画像IDが指定されていません。" },
+  "errorNotFound": { "message": "画像が見つかりませんでした。もう一度撮影してください。" },
+  "errorComposeFailed": { "message": "画像の合成に失敗しました。もう一度撮影してください。" },
+  "errorTooLarge": { "message": "画像が大きすぎて書き出せませんでした。" },
+  "errorExportFailed": { "message": "書き出しに失敗しました。" },
+  "errorCopyNotAllowed": { "message": "コピーできませんでした。このタブをクリックしてから、もう一度お試しください。" },
+  "errorCopyFailed": { "message": "コピーに失敗しました。" },
+  "errorCopySplit": { "message": "分割された画像はまとめてコピーできません。各部分を保存するか、PDFをお使いください。" },
+
+  "errorBlockedInternal": { "message": "Chromeの内部ページは撮影できません。通常のWebページを開いてからお試しください。" },
+  "errorBlockedWebStore": { "message": "Chromeウェブストアのページは撮影できません。" },
+  "errorBlockedScheme": { "message": "このページは撮影できません。" },
+  "errorBlockedFile": { "message": "ローカルファイルを撮影できませんでした。chrome://extensions の写しの「詳細」で「ファイルのURLへのアクセスを許可する」が有効か確認してください。PDFなど一部のファイルは、有効にしても撮影できません。" },
+  "errorCaptureFailed": { "message": "撮影できませんでした。ページを再読み込みしてからお試しください。" },
+  "errorTabChanged": { "message": "タブが切り替わったため中断しました。撮影中はそのタブを表示したままにしてください。" },
+  "errorQuotaExceeded": { "message": "撮影の間隔が短すぎます。設定で待機時間を長くしてからお試しください。" },
+  "errorPageTooTall": { "message": "このページは長すぎて撮影できません。" },
+
+  "optionsTitle": { "message": "写しの設定" },
+  "optionsHeading": { "message": "設定" },
+  "optionsSectionCapture": { "message": "撮影" },
+  "optionsSectionExport": { "message": "書き出し" },
+  "optionsImageFormat": { "message": "画像形式" },
+  "optionsImageFormatHint": { "message": "画像が分割されたときの「この部分を保存」で使う形式です。上部のPNG／JPEGボタンはそれぞれの形式で保存します。" },
+  "optionsSaveFailed": { "message": "保存できませんでした" },
+  "optionsFormatPng": { "message": "PNG（可逆・ファイルは大きい）" },
+  "optionsFormatJpeg": { "message": "JPEG（軽い）" },
+  "optionsJpegQuality": { "message": "JPEG品質" },
+  "optionsCaptureDelay": { "message": "キャプチャ待機時間" },
+  "optionsCaptureDelayHint": { "message": "1枚ごとの待ち時間です。繋ぎ目がずれる場合は長くしてください（実効下限500ms）。" },
+  "optionsHideFixed": { "message": "固定ヘッダーなどを自動で隠す" },
+  "optionsHideFixedHint": { "message": "2枚目以降で固定要素を隠し、同じヘッダーが何度も写るのを防ぎます。" },
+  "optionsPreScroll": { "message": "撮影前にページ全体を一度スクロールする" },
+  "optionsPreScrollHint": { "message": "遅延読み込みの画像が写らない場合に有効です。撮影に時間がかかります。" },
+  "optionsPdfPaper": { "message": "PDFの用紙" },
+  "optionsPdfPaperImage": { "message": "画像サイズ（縦長1ページ）" },
+  "optionsPdfPaperA4": { "message": "A4縦に分割" },
+  "optionsFilenameTemplate": { "message": "ファイル名" },
+  "optionsFilenameHint": { "message": "使える置き換え：{title} ページタイトル / {url_host} ドメイン / {yyyyMMdd-HHmmss} 撮影日時" },
+  "optionsFilenamePreview": {
+    "message": "例：$NAME$",
+    "placeholders": { "name": { "content": "$1", "example": "記事名_20260813-142530.png" } }
+  },
+  "optionsShortcut": { "message": "キーボードショートカット" },
+  "optionsShortcutNone": { "message": "未設定" },
+  "optionsShortcutHint": { "message": "変更は chrome://extensions/shortcuts から行えます（アドレスバーに貼り付けてください）。" },
+  "optionsSaved": { "message": "保存しました" },
+  "optionsReset": { "message": "既定に戻す" },
+  "optionsLicenses": { "message": "同梱ライブラリとライセンス" },
+
+  "unitMs": { "message": "ミリ秒" }
+}
